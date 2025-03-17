@@ -56,15 +56,20 @@ function PureChatHeader({
         />
       )} */}
 
-      <Button
-        className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"
-        asChild
-      >
-        <span>
-          <VercelIcon size={16} />
-          Connect Wallet
-        </span>
-      </Button>
+      <div className="flex items-center ml-auto gap-2 md:gap-5 order-5 md:ml-auto">
+        <Link href={"/leaderboard"} className="underline underline-offset-4">
+          Leaderboard
+        </Link>
+        <Button
+          className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4"
+          asChild
+        >
+          <span>
+            <VercelIcon size={16} />
+            Connect Wallet
+          </span>
+        </Button>
+      </div>
     </header>
   );
 }
