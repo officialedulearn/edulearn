@@ -1,9 +1,7 @@
 "use client";
-
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useWindowSize } from "usehooks-ts";
-
 import { ModelSelector } from "@/components/model-selector";
 import { SidebarToggle } from "@/components/sidebar-toggle";
 import { Button } from "@/components/ui/button";
@@ -11,9 +9,8 @@ import { PlusIcon, VercelIcon } from "./icons";
 import { useSidebar } from "./ui/sidebar";
 import { memo } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { ConnectButton } from "thirdweb/react";
-import { client } from "@/lib/client";
-import { defineChain } from "thirdweb";
+import connectButton from "./connectbutton";
+import CustomConnectButton from "./connectbutton";
 
 function PureChatHeader({
   chatId,
@@ -60,7 +57,7 @@ function PureChatHeader({
       )}
 
       <div className="ml-auto">
-        <ConnectButton client={client} chain={defineChain(656476)} />
+        <CustomConnectButton />
       </div>
     </header>
   );

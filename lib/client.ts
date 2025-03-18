@@ -1,5 +1,8 @@
+// lib/client.ts
 import { createThirdwebClient } from "thirdweb";
- 
-export const client = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID as unknown as string,
-});
+
+const clientId = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID!;
+const secretKey = process.env.THIRDWEB_SECRET!;
+export const client = createThirdwebClient(
+  secretKey ? { secretKey } : { clientId }
+);
