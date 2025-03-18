@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
 import { ThemeProvider } from "@/components/theme-provider";
-
+import { ThirdwebProvider } from "thirdweb/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -64,7 +64,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-center" />
-          {children}
+          <ThirdwebProvider>{children}</ThirdwebProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -11,6 +11,9 @@ import { PlusIcon, VercelIcon } from "./icons";
 import { useSidebar } from "./ui/sidebar";
 import { memo } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { ConnectButton } from "thirdweb/react";
+import { client } from "@/lib/client";
+import { defineChain } from "thirdweb";
 
 function PureChatHeader({
   chatId,
@@ -49,26 +52,15 @@ function PureChatHeader({
         </Tooltip>
       )}
 
-      {/* {!isReadonly && (
+      {!isReadonly && (
         <ModelSelector
           selectedModelId={selectedModelId}
           className="order-1 md:order-2"
         />
-      )} */}
+      )}
 
-      <div className="flex items-center ml-auto gap-2 md:gap-5 order-5 md:ml-auto">
-        <Link href={"/leaderboard"} className="underline underline-offset-4">
-          Leaderboard
-        </Link>
-        <Button
-          className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4"
-          asChild
-        >
-          <span>
-            <VercelIcon size={16} />
-            Connect Wallet
-          </span>
-        </Button>
+      <div className="ml-auto">
+        <ConnectButton client={client} chain={defineChain(656476)} />
       </div>
     </header>
   );
