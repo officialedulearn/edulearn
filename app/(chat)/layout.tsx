@@ -1,9 +1,6 @@
 import { cookies } from "next/headers";
-
-import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
 import Script from "next/script";
+import { LayoutClient } from "./LayoutClient";
 
 export const experimental_ppr = true;
 
@@ -27,10 +24,7 @@ export default async function Layout({
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
       />
-      <SidebarProvider defaultOpen={!isCollapsed}>
-        <AppSidebar user={user && user} />
-        <SidebarInset>{children}</SidebarInset>
-      </SidebarProvider>
+      <LayoutClient isCollapsed={isCollapsed}>{children}</LayoutClient>
     </>
   );
 }

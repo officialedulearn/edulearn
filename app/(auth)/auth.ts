@@ -1,14 +1,7 @@
-import { compare } from 'bcrypt-ts';
-import NextAuth, { type User, type Session } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-
-import { getUser } from '@/lib/db/queries';
-
-import { authConfig } from './auth.config';
-
-interface ExtendedSession extends Session {
-  user: User;
-}
+import NextAuth from "next-auth";
+import { JWT } from "next-auth/jwt";
+import { isLoggedIn, getUser as getWeb3User } from "@/actions/login";
+import { AdapterUser } from "next-auth/adapters";
 
 export const {
   handlers: { GET, POST },
@@ -16,37 +9,27 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
-  ...authConfig,
-  providers: [
-    Credentials({
-      credentials: {},
-      async authorize({ email, password }: any) {
-        const users = await getUser(email);
-        if (users.length === 0) return null;
-        // biome-ignore lint: Forbidden non-null assertion.
-        const passwordsMatch = await compare(password, users[0].password!);
-        if (!passwordsMatch) return null;
-        return users[0] as any;
-      },
-    }),
-  ],
+  providers: [],
   callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+    async jwt({ token }: { token: JWT }) {
+      if (!token.sub) {
+        const web3LoggedIn = await isLoggedIn();
+        if (web3LoggedIn) {
+          const web3User = await getWeb3User();
+          if (web3User) {
+            token.sub = web3User.sub; 
+          }
+        }
       }
-
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: ExtendedSession;
-      token: any;
-    }) {
-      if (session.user) {
-        session.user.id = token.id as string;
+    async session({ session, token }: { session: any; token: JWT }) {
+      if (!session.user) {
+        session.user = {} as AdapterUser;
+      }
+
+      if (token.sub) {
+        session.user.id = token.sub; 
       }
 
       return session;
