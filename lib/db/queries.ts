@@ -1,6 +1,4 @@
 import "server-only";
-
-import { genSaltSync, hashSync } from "bcrypt-ts";
 import { and, asc, desc, eq, gt, gte, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -16,13 +14,7 @@ import {
   message,
   vote,
 } from "./schema";
-import { ArtifactKind } from "@/components/artifact";
 
-// Optionally, if not using email/pass login, you can
-// use the Drizzle adapter for Auth.js / NextAuth
-// https://authjs.dev/reference/adapter/drizzle
-
-// biome-ignore lint: Forbidden non-null assertion.
 const client = postgres(process.env.POSTGRES_URL!);
 const db = drizzle(client);
 
@@ -46,18 +38,18 @@ export async function createUser(address: string) {
 
 export async function saveChat({
   id,
-  userId,
+  userAddress,
   title,
 }: {
   id: string;
-  userId: string;
+  userAddress: string;
   title: string;
 }) {
   try {
     return await db.insert(chat).values({
       id,
       createdAt: new Date(),
-      userId,
+      userAddress,
       title,
     });
   } catch (error) {
@@ -83,7 +75,7 @@ export async function getChatsByUserId({ id }: { id: string }) {
     return await db
       .select()
       .from(chat)
-      .where(eq(chat.userId, id))
+      .where(eq(chat.userAddress, id))
       .orderBy(desc(chat.createdAt));
   } catch (error) {
     console.error("Failed to get chats by user from database");
@@ -167,13 +159,11 @@ export async function getVotesByChatId({ id }: { id: string }) {
 export async function saveDocument({
   id,
   title,
-  kind,
   content,
   userId,
 }: {
   id: string;
   title: string;
-  kind: ArtifactKind;
   content: string;
   userId: string;
 }) {
@@ -181,7 +171,6 @@ export async function saveDocument({
     return await db.insert(document).values({
       id,
       title,
-      kind,
       content,
       userId,
       createdAt: new Date(),

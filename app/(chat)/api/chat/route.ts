@@ -1,173 +1,137 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/app/(auth)/auth";
+import { getUser } from "@/actions/login";
+import { generateUUID, getMostRecentUserMessage } from "@/lib/utils";
 import {
-  type Message,
-  createDataStreamResponse,
-  smoothStream,
-  streamText,
-} from 'ai';
-import { auth } from '@/app/(auth)/auth';
-import { systemPrompt } from '@/lib/ai/prompts';
-import {
-  deleteChatById,
-  getChatById,
-  saveChat,
   saveMessages,
-} from '@/lib/db/queries';
-import {
-  generateUUID,
-  getMostRecentUserMessage,
-  sanitizeResponseMessages,
-} from '@/lib/utils';
-import { generateTitleFromUserMessage } from '../../actions';
-import { createDocument } from '@/lib/ai/tools/create-document';
-import { updateDocument } from '@/lib/ai/tools/update-document';
-import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
-import { getWeather } from '@/lib/ai/tools/get-weather';
-import { isProductionEnvironment } from '@/lib/constants';
-import { NextResponse } from 'next/server';
-import { myProvider } from '@/lib/ai/providers';
+  saveDocument,
+  saveChat,
+  getChatById,
+} from "@/lib/db/queries";
+import { createDataStreamResponse } from "@/lib/utils";
+import { GoogleGenAI } from "@google/genai";
+import { systemPrompt } from "@/lib/ai/prompts";
+import { generateTitleFromUserMessage } from "../../actions";
+import { Message } from "@/components/message"; // Import custom Message type
 
+const API_KEY = process.env.GEMINI_API_KEY as string;
+const genAI = new GoogleGenAI({ apiKey: API_KEY });
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-    const {
-      id,
-      messages,
-      selectedChatModel,
-    }: {
-      id: string;
-      messages: Array<Message>;
-      selectedChatModel: string;
-    } = await request.json();
+    // Parse the request body
+    const body = await request.json();
+    console.log(body);
 
+    const { id, messages, selectedChatModel } = body;
+
+    // Authenticate user
     const session = await auth();
+    const user = await getUser();
 
-    if (!session || !session.user || !session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
+    if (!user || !user.sub) {
+      return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Get the most recent user message
     const userMessage = getMostRecentUserMessage(messages);
 
     if (!userMessage) {
-      return new Response('No user message found', { status: 400 });
+      return new NextResponse("No user message found", { status: 400 });
     }
 
+    // Check if the chat already exists
     const chat = await getChatById({ id });
+    let title: string;
 
     if (!chat) {
-      const title = await generateTitleFromUserMessage({
-        message: userMessage,
-      });
-
-      await saveChat({ id, userId: session.user.id, title });
+      title = await generateTitleFromUserMessage({ message: userMessage });
+      console.log(title)
+      await saveChat({ id, userAddress: user.sub, title });
     } else {
-      if (chat.userId !== session.user.id) {
-        return new Response('Unauthorized', { status: 401 });
+      if (chat.userAddress !== user.sub) {
+        return new NextResponse("Unauthorized", { status: 401 });
       }
+      // Assign the existing chat's title
+      title = chat.title;
     }
 
+    // Save the user message
     await saveMessages({
       messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
     });
 
-    return createDataStreamResponse({
-      execute: (dataStream) => {
-        const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
-          messages,
-          maxSteps: 5,
-          experimental_activeTools:
-            selectedChatModel === 'chat-model-reasoning'
-              ? []
-              : [
-                  'getWeather',
-                  'createDocument',
-                  'updateDocument',
-                  'requestSuggestions',
-                ],
-          experimental_transform: smoothStream({ chunking: 'word' }),
-          experimental_generateMessageId: generateUUID,
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-          },
-          onFinish: async ({ response, reasoning }) => {
-            if (session.user?.id) {
-              try {
-                const sanitizedResponseMessages = sanitizeResponseMessages({
-                  messages: response.messages,
-                  reasoning,
-                });
+    try {
+      // Get the model instance
+    
 
-                await saveMessages({
-                  messages: sanitizedResponseMessages.map((message) => {
-                    return {
-                      id: message.id,
-                      chatId: id,
-                      role: message.role,
-                      content: message.content,
-                      createdAt: new Date(),
-                    };
-                  }),
-                });
-              } catch (error) {
-                console.error('Failed to save chat');
-              }
-            }
-          },
-          experimental_telemetry: {
-            isEnabled: isProductionEnvironment,
-            functionId: 'stream-text',
-          },
+      // Properly format messages for Gemini API
+      const formattedMessages = [];
+      
+      for (const msg of messages) {
+        formattedMessages.push({
+          role: msg.role === "assistant" ? "model" : "user",
+          parts: [{ text: msg.content }]
         });
+      }
 
-        result.consumeStream();
+      // Generate content with proper format
+      const result = await genAI.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: formattedMessages,
+  
+        config: {
+          maxOutputTokens: 500,
+          temperature: 0.1,
+          systemInstruction: "You are an AI tutor designed to help students learn effectively by guiding them through problem-solving rather than simply providing direct answers. Your responses should be engaging, thought-provoking, and structured to encourage active learning. You should use strategic hints, analogies, and step-by-step guidance to help students arrive at answers on their own. Keep your tone friendly, supportive, and engaging, incorporating relevant emojis where appropriate to make the interaction more lively."
+        },
+      });
 
-        result.mergeIntoDataStream(dataStream, {
-          sendReasoning: true,
-        });
-      },
-      onError: () => {
-        return 'Oops, an error occured!';
-      },
-    });
-  } catch (error) {
-    return NextResponse.json({ error }, { status: 400 });
-  }
-}
+      const response =  result.text;
+      const fullResponse = response;
 
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+      // Create assistant message to save
+      const assistantMessage = {
+        id: generateUUID(),
+        role: "assistant",
+        content: fullResponse,
+        createdAt: new Date(),
+        chatId: id
+      };
 
-  if (!id) {
-    return new Response('Not Found', { status: 404 });
-  }
+      // Save the assistant message
+      await saveMessages({
+        messages: [assistantMessage],
+      });
 
-  const session = await auth();
+      // Save the document if user exists
+      if (user?.sub) {
+        try {
+          await saveDocument({
+            id: generateUUID(),
+            title,
+            content: fullResponse as unknown as string,
+            userId: user.sub as string,
+          });
+        } catch (error) {
+          console.error("Failed to save document:", error);
+          // Continue execution - don't return here as we still want to return the response
+        }
+      }
 
-  if (!session || !session.user) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+      // Return the properly formatted response - don't wrap in unnecessary JSON
+      return new Response(fullResponse, {
+        headers: { "Content-Type": "text/plain" },
+      });
 
-  try {
-    const chat = await getChatById({ id });
-
-    if (chat.userId !== session.user.id) {
-      return new Response('Unauthorized', { status: 401 });
+    } catch (error) {
+      console.error("Error generating content:", error);
+      return new NextResponse(`Error generating content: ${error instanceof Error ? error.message : String(error)}`, { status: 500 });
     }
-
-    await deleteChatById({ id });
-
-    return new Response('Chat deleted', { status: 200 });
   } catch (error) {
-    return new Response('An error occurred while processing your request', {
+    console.error("An error occurred in the POST function:", error);
+    return new NextResponse("An error occurred while processing your request", {
       status: 500,
     });
   }

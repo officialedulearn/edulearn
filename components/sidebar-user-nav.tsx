@@ -17,10 +17,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { truncateWalletAddress } from '@/app/leaderboard/page';
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
 
+  const truncatedAddress = truncateWalletAddress(user?.address)
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -34,7 +36,7 @@ export function SidebarUserNav({ user }: { user: User }) {
                 height={24}
                 className="rounded-full"
               />
-              <span className="truncate">{user?.address}</span>
+              <span className="truncate">{truncatedAddress}</span>
               <ChevronUp className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>

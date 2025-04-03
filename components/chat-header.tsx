@@ -49,12 +49,7 @@ function PureChatHeader({
         </Tooltip>
       )}
 
-      {!isReadonly && (
-        <ModelSelector
-          selectedModelId={selectedModelId}
-          className="order-1 md:order-2"
-        />
-      )}
+      
 
       <div className="ml-auto">
         <CustomConnectButton />

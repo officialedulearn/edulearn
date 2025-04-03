@@ -1,24 +1,45 @@
-import { Message } from "ai";
-import { PreviewMessage, ThinkingMessage } from "./message";
-import { useScrollToBottom } from "./use-scroll-to-bottom";
-import { Overview } from "./overview";
-import { memo } from "react";
-import { Vote } from "@/lib/db/schema";
-import equal from "fast-deep-equal";
-import { UseChatHelpers } from "@ai-sdk/react";
+'use client';
 
-interface MessagesProps {
+import cx from 'classnames';
+import { AnimatePresence, motion } from 'framer-motion';
+import { memo, useState } from 'react';
+import type { Vote } from '@/lib/db/schema';
+import { DocumentToolCall, DocumentToolResult } from './document';
+import { PencilEditIcon, SparklesIcon } from './icons';
+import { Markdown } from './markdown';
+import { MessageActions } from './message-actions';
+import { PreviewAttachment } from './preview-attachment';
+import { Weather } from './weather';
+import equal from 'fast-deep-equal';
+import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { MessageEditor } from './message-editor';
+import { DocumentPreview } from './document-preview';
+import { MessageReasoning } from './message-reasoning';
+import { useScrollToBottom } from './use-scroll-to-bottom';
+import { Overview } from './overview';
+import { PreviewMessage, ThinkingMessage } from './message';
+
+import type { Message } from './message';
+
+type ChatRequestOptions = unknown;
+
+type MessagesProps = {
   chatId: string;
-  status: UseChatHelpers["status"];
+  status: string;
   votes: Array<Vote> | undefined;
   messages: Array<Message>;
-  setMessages: UseChatHelpers["setMessages"];
-  reload: UseChatHelpers["reload"];
+  setMessages: (
+    messages: Message[] | ((messages: Message[]) => Message[]),
+  ) => void;
+  reload: (
+    chatRequestOptions?: ChatRequestOptions,
+  ) => Promise<void>;
   isReadonly: boolean;
-  isArtifactVisible: boolean;
-}
+};
 
-function PureMessages({
+const PureMessages = ({
   chatId,
   status,
   votes,
@@ -26,7 +47,7 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
-}: MessagesProps) {
+}: MessagesProps) => {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
 
@@ -35,39 +56,35 @@ function PureMessages({
       ref={messagesContainerRef}
       className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
     >
-      {/* {messages.length === 0 && <Overview />} */}
-
       {messages.map((message, index) => (
         <PreviewMessage
           key={message.id}
           chatId={chatId}
           message={message}
-          isLoading={status === "streaming" && messages.length - 1 === index}
+          isLoading={status === 'streaming' && messages.length - 1 === index}
           vote={
             votes
               ? votes.find((vote) => vote.messageId === message.id)
               : undefined
           }
           setMessages={setMessages}
-          reload={reload}
+          reload={async (chatRequestOptions) => {
+            await reload(chatRequestOptions);
+          }}
           isReadonly={isReadonly}
         />
       ))}
 
-      {status === "submitted" &&
+      {status === 'submitted' &&
         messages.length > 0 &&
-        messages[messages.length - 1].role === "user" && <ThinkingMessage />}
+        messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
 
-      <div
-        ref={messagesEndRef}
-        className="shrink-0 min-w-[24px] min-h-[24px]"
-      />
+      <div ref={messagesEndRef} className="shrink-0 min-w-[24px] min-h-[24px]" />
     </div>
   );
-}
+};
 
 export const Messages = memo(PureMessages, (prevProps, nextProps) => {
-  if (prevProps.isArtifactVisible && nextProps.isArtifactVisible) return true;
 
   if (prevProps.status !== nextProps.status) return false;
   if (prevProps.status && nextProps.status) return false;

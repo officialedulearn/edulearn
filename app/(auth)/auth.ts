@@ -10,6 +10,7 @@ export const {
   signOut,
 } = NextAuth({
   providers: [],
+  secret: process.env.NEXTAUTH_SECRET, 
   callbacks: {
     async jwt({ token }: { token: JWT }) {
       if (!token.sub) {

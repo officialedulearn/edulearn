@@ -56,7 +56,7 @@ const leaderboardData = [
   },
 ];
 
-const truncateWalletAddress = (address: string) => {
+export const truncateWalletAddress = (address: string) => {
   return `${address.substring(0, 6)}...${address.substring(
     address.length - 4
   )}`;

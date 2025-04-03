@@ -1,5 +1,4 @@
 import { auth } from '@/app/(auth)/auth';
-import { ArtifactKind } from '@/components/artifact';
 import {
   deleteDocumentsByIdAfterTimestamp,
   getDocumentsById,
@@ -52,8 +51,7 @@ export async function POST(request: Request) {
   const {
     content,
     title,
-    kind,
-  }: { content: string; title: string; kind: ArtifactKind } =
+  }: { content: string; title: string;} =
     await request.json();
 
   if (session.user?.id) {
@@ -61,7 +59,6 @@ export async function POST(request: Request) {
       id,
       content,
       title,
-      kind,
       userId: session.user.id,
     });
 
