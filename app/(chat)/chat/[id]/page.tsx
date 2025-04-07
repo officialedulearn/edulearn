@@ -8,20 +8,24 @@ import { convertToUIMessages } from "@/lib/utils";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { getUser } from "@/actions/login";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const { id } = params;
+export default async function Page(props: { params: { id: string } }) {
+  const { id } = props.params;
+
+  console.log("ID from params:", id);
+
   const chat = await getChatById({ id });
 
+  console.log("Chat result:", chat);
+
   if (!chat) {
+    console.log("Chat not found, redirecting to 404");
     notFound();
   }
-
   const session = await auth();
   const user = await getUser();
 
   if (chat.visibility === "private") {
-    if (!session || !session.user) {
+    if (!user || !user.sub) {
       return notFound();
     }
 

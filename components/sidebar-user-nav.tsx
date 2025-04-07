@@ -22,7 +22,7 @@ import { truncateWalletAddress } from '@/app/leaderboard/page';
 export function SidebarUserNav({ user }: { user: User }) {
   const { setTheme, theme } = useTheme();
 
-  const truncatedAddress = truncateWalletAddress(user?.address)
+  const truncatedAddress = truncateWalletAddress(user?.address || '');
   return (
     <SidebarMenu>
       <SidebarMenuItem>

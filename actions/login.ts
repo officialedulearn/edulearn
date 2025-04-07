@@ -5,7 +5,7 @@ import { client } from "@/lib/client";
 import { cookies } from "next/headers";
 import { createUser, getUser as getUserFromDB } from "@/lib/db/queries";
 
-const privateKey = process.env.AUTH_PRIVATE_KEY || "";
+const privateKey = process.env.NEXT_PUBLIC_AUTH_PRIVATE_KEY || "";
 
 if (!privateKey) {
   throw new Error("Missing AUTH_PRIVATE_KEY in .env file.");
@@ -61,4 +61,15 @@ export async function getUser() {
   }
 
   return null;
+}
+
+export async function getUserFromDetails(address:string) {
+  try {
+    const user = await getUserFromDB(address);  
+    return user[0];
+  } catch (error) {
+    console.error("Failed to get user from database");
+    throw error;
+    
+  }
 }
