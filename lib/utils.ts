@@ -1,13 +1,14 @@
 import type {
   CoreAssistantMessage,
   CoreToolMessage,
-  Message,
+
   TextStreamPart,
   ToolInvocation,
   ToolSet,
 } from 'ai';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import type {Message} from '@/components/message'
 
 import type { Message as DBMessage, Document } from '@/lib/db/schema';
 
@@ -37,6 +38,31 @@ export const fetcher = async (url: string) => {
   return res.json();
 };
 
+export function createDataStreamResponse({
+  execute,
+  onError,
+}: {
+  execute: (dataStream: any) => void;
+  onError?: (error: any) => string;
+}) {
+  return new Promise((resolve, reject) => {
+    try {
+      const dataStream: any = {}; // Initialize your data stream object
+      execute(dataStream);
+
+      resolve(dataStream);
+    } catch (error) {
+      console.error('Error in createDataStreamResponse:', error);
+      if (onError) {
+        reject(onError(error));
+      } else {
+        reject('An error occurred while processing the request.');
+      }
+    }
+  });
+}
+
+
 export function getLocalStorage(key: string) {
   if (typeof window !== 'undefined') {
     return JSON.parse(localStorage.getItem(key) || '[]');
@@ -60,12 +86,12 @@ function addToolMessageToChat({
   messages: Array<Message>;
 }): Array<Message> {
   return messages.map((message) => {
-    if (message.toolInvocations) {
+    if (message.toolInvocations && Array.isArray(message.toolInvocations)) {
       return {
         ...message,
-        toolInvocations: message.toolInvocations.map((toolInvocation) => {
+        toolInvocations: message.toolInvocations.map((toolInvocation: any) => {
           const toolResult = toolMessage.content.find(
-            (tool) => tool.toolCallId === toolInvocation.toolCallId,
+            (tool) => tool.toolCallId === toolInvocation.toolCallId
           );
 
           if (toolResult) {
@@ -84,6 +110,7 @@ function addToolMessageToChat({
     return message;
   });
 }
+
 
 export function convertToUIMessages(
   messages: Array<DBMessage>,
@@ -183,37 +210,35 @@ export function sanitizeResponseMessages({
 }
 
 export function sanitizeUIMessages(messages: Array<Message>): Array<Message> {
-  const messagesBySanitizedToolInvocations = messages.map((message) => {
-    if (message.role !== 'assistant') return message;
+  return messages
+    .map((message) => {
+      if (message.role !== 'assistant' || !message.toolInvocations) return message;
 
-    if (!message.toolInvocations) return message;
+      const toolInvocations = Array.isArray(message.toolInvocations)
+        ? message.toolInvocations
+        : [];
 
-    const toolResultIds: Array<string> = [];
+      const toolResultIds: Array<string> = toolInvocations
+        .filter((toolInvocation: any) => toolInvocation.state === 'result')
+        .map((toolInvocation: any) => toolInvocation.toolCallId);
 
-    for (const toolInvocation of message.toolInvocations) {
-      if (toolInvocation.state === 'result') {
-        toolResultIds.push(toolInvocation.toolCallId);
-      }
-    }
+      const sanitizedToolInvocations = toolInvocations.filter(
+        (toolInvocation: any) =>
+          toolInvocation.state === 'result' || toolResultIds.includes(toolInvocation.toolCallId)
+      );
 
-    const sanitizedToolInvocations = message.toolInvocations.filter(
-      (toolInvocation) =>
-        toolInvocation.state === 'result' ||
-        toolResultIds.includes(toolInvocation.toolCallId),
+      return {
+        ...message,
+        toolInvocations: sanitizedToolInvocations,
+      };
+    })
+    .filter(
+      (message) =>
+        message.content.length > 0 ||
+        (message.toolInvocations && (message.toolInvocations as any[]).length > 0)
     );
-
-    return {
-      ...message,
-      toolInvocations: sanitizedToolInvocations,
-    };
-  });
-
-  return messagesBySanitizedToolInvocations.filter(
-    (message) =>
-      message.content.length > 0 ||
-      (message.toolInvocations && message.toolInvocations.length > 0),
-  );
 }
+
 
 export function getMostRecentUserMessage(messages: Array<Message>) {
   const userMessages = messages.filter((message) => message.role === 'user');
@@ -229,3 +254,4 @@ export function getDocumentTimestampByIndex(
 
   return documents[index].createdAt;
 }
+ 

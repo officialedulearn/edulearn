@@ -1,0 +1,16 @@
+{
+    "name": "EduLearn Certificate",
+    "description": "Awarded for completing 1000 points worth of learning on EduLearn.",
+    "image": "ipfs://bafybeiddljjima37xqapgcqbzdznb2mercbhx3jc65a65ofzu6b56ehk2a", 
+    "attributes": [
+      {
+        "trait_type": "Achievement",
+        "value": "1000 Points"
+      },
+      {
+        "trait_type": "Platform",
+        "value": "EduLearn"
+      }
+    ]
+  }
+  
