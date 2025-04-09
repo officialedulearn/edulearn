@@ -124,11 +124,6 @@
 						"internalType": "uint256",
 						"name": "userPoints",
 						"type": "uint256"
-					},
-					{
-						"internalType": "string",
-						"name": "certUri",
-						"type": "string"
 					}
 				],
 				"name": "rewardAndCertify",
@@ -389,11 +384,11 @@
 			]
 		},
 		"contracts/EduLearn.sol": {
-			"keccak256": "0x619c82c1ba3e98453331dfc9ec6154009a1ef8f3c3c8aec869b29dbe78346514",
+			"keccak256": "0x0e1b6b5be4ea980d0b4f6c427b93aede67d1bfc9e114ce1ad4ca6a78cb736715",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://cdfa8bd08d65a1fb7e95a2b00dcc8727b8c383c073fedf6fa8a18efc3ef7514b",
-				"dweb:/ipfs/QmaJU7D9SiTNUXXDr8zjWfnvCt6BCfHCnfeEXvgXRuc7xE"
+				"bzz-raw://3e37883fb1cf2def93469300957f8d319745781a11d8ce4b8b035c61fe6bf511",
+				"dweb:/ipfs/QmacVn4ZxkL4ETpGQRC9ZecSD5z6MFfaKUQFrwRAY57hfy"
 			]
 		}
 	},

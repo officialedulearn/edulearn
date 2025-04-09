@@ -5,7 +5,6 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import Home from "@/components/home/Home";
-
 export function LayoutClient({
   children,
   isCollapsed,
@@ -23,12 +22,10 @@ export function LayoutClient({
     }
   }, [userAccount]);
   
-  // Function to handle chat start
   const handleStartChat = () => {
     setShowChat(true);
   };
   
-  // Render logic
   return (
     <>
       {showChat ? (

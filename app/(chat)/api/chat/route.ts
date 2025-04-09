@@ -20,13 +20,11 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-    // Parse the request body
     const body = await request.json();
     console.log(body);
 
     const { id, messages, selectedChatModel } = body;
 
-    // Authenticate user
     const session = await auth();
     const user = await getUser();
 
@@ -34,7 +32,6 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Get the most recent user message
     const userMessage = getMostRecentUserMessage(messages);
 
     if (!userMessage) {
@@ -47,7 +44,7 @@ export async function POST(request: Request) {
 
     if (!chat) {
       title = await generateTitleFromUserMessage({ message: userMessage });
-      console.log(title)
+      console.log(title);
       await saveChat({ id, userAddress: user.sub, title });
     } else {
       if (chat.userAddress !== user.sub) {
@@ -63,49 +60,39 @@ export async function POST(request: Request) {
     });
 
     try {
-      // Get the model instance
-    
-
-      // Properly format messages for Gemini API
       const formattedMessages = [];
-      
+
       for (const msg of messages) {
         formattedMessages.push({
           role: msg.role === "assistant" ? "model" : "user",
-          parts: [{ text: msg.content }]
+          parts: [{ text: msg.content }],
         });
       }
-
-      // Generate content with proper format
       const result = await genAI.models.generateContent({
         model: "gemini-2.0-flash",
         contents: formattedMessages,
-  
+
         config: {
           maxOutputTokens: 500,
           temperature: 0.1,
-          systemInstruction: "You are an AI tutor designed to help students learn effectively by guiding them through problem-solving rather than simply providing direct answers. Your responses should be engaging, thought-provoking, and structured to encourage active learning. You should use strategic hints, analogies, and step-by-step guidance to help students arrive at answers on their own. Keep your tone friendly, supportive, and engaging, incorporating relevant emojis where appropriate to make the interaction more lively."
+          systemInstruction:
+            "You are an AI tutor designed to help students learn effectively by guiding them through problem-solving rather than simply providing direct answers. Your responses should be engaging, thought-provoking, and structured to encourage active learning. You should use strategic hints, analogies, and step-by-step guidance to help students arrive at answers on their own. Keep your tone friendly, supportive, and engaging, incorporating relevant emojis where appropriate to make the interaction more lively.",
         },
       });
 
-      const response =  result.text;
+      const response = result.text;
       const fullResponse = response;
-
-      // Create assistant message to save
       const assistantMessage = {
         id: generateUUID(),
         role: "assistant",
         content: fullResponse,
         createdAt: new Date(),
-        chatId: id
+        chatId: id,
       };
-
-      // Save the assistant message
       await saveMessages({
         messages: [assistantMessage],
       });
 
-      // Save the document if user exists
       if (user?.sub) {
         try {
           await saveDocument({
@@ -116,18 +103,20 @@ export async function POST(request: Request) {
           });
         } catch (error) {
           console.error("Failed to save document:", error);
-          // Continue execution - don't return here as we still want to return the response
         }
       }
 
-      // Return the properly formatted response - don't wrap in unnecessary JSON
       return new Response(fullResponse, {
         headers: { "Content-Type": "text/plain" },
       });
-
     } catch (error) {
       console.error("Error generating content:", error);
-      return new NextResponse(`Error generating content: ${error instanceof Error ? error.message : String(error)}`, { status: 500 });
+      return new NextResponse(
+        `Error generating content: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        { status: 500 }
+      );
     }
   } catch (error) {
     console.error("An error occurred in the POST function:", error);

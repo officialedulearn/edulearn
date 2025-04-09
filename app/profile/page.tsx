@@ -6,12 +6,20 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
+import { Loader2, Router } from "lucide-react";
 import { claimTokensForStudent as claimTokens, rewardCertificateToStudent } from "@/actions/claim-assets";
-import { useContract, useContractWrite, useContractMetadata } from "@thirdweb-dev/react";
-import { Web3Button } from "@thirdweb-dev/react";
-import eduManagerAbi from "@/lib/artifacts/EduManagerAbi.json"
-import axios from "axios";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 
 interface UserData {
@@ -24,6 +32,9 @@ const Page = () => {
   const [userAddress, setUserAddress] = useState<string | undefined>("");
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [showAlert, setShowAlert] = useState(false);
+const [alertMessage, setAlertMessage] = useState("Your asset has been minted successfully!");
+
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -63,26 +74,21 @@ const Page = () => {
     ? getUserLevel(user.xp)
     : { level: 0, title: "Unknown" };
 
-  const claimTokensForUser = async (userAddress: string, userPoints: number) => {
-    const claimedTokens = claimTokens(userAddress, userPoints);
-    console.log(
-      "Claiming tokens for user:",
-      userAddress,
-      "with points:",
-      userPoints
-    );
-  };
-
-  const claimNFTforUser = async (address: string, userPoints: number) => {
-    const certUri = await axios.post("/api/nft", {
-      userAddress: address,
-      points: userPoints
-    })
+    const claimTokensForUser = async (userAddress: string, userPoints: number) => {
+      await claimTokens(userAddress, userPoints);
+      console.log("Claimed tokens for user:", userAddress, "with points:", userPoints);
+      setAlertMessage("🎉 Tokens have been minted successfully!");
+      setShowAlert(true);
+      
+    };
     
-    const claimedNFT = await rewardCertificateToStudent(address,userPoints, certUri.data.metadataURI);
-    console.log("Claiming NFT for user:", claimedNFT);
-
-  }
+    const claimNFTforUser = async (address: string, userPoints: number) => {
+      await rewardCertificateToStudent(address, userPoints);
+      console.log("Claimed NFT for user:", address);
+      setAlertMessage("🎉 NFT has been rewarded successfully!");
+      setShowAlert(true);
+    };
+    
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -180,7 +186,7 @@ const Page = () => {
                       whileTap={{ scale: 0.95 }}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-md text-white font-medium transition-colors duration-200"
                       onClick={() => {
-                        claimTokens(userAddress as string, user.xp);
+                        claimTokensForUser(userAddress as string, user.xp!);
                       }}
                     >
                       Claim
@@ -191,7 +197,7 @@ const Page = () => {
                     <div className="p-4 border border-zinc-800 rounded-lg bg-zinc-800/50 flex items-center justify-between">
                       <div>
                         <h3 className="font-medium text-emerald-300">
-                          XP Milestone: 2000
+                          XP Milestone: 1000
                         </h3>
                         <p className="text-sm text-zinc-400">Unlock NFT</p>
                       </div>
@@ -199,7 +205,7 @@ const Page = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-md text-white font-medium transition-colors duration-200"
-                        onClick={() => claimNFTforUser(userAddress as unknown as string, user.xp)}
+                        onClick={() => claimNFTforUser(userAddress as unknown as string, user.xp!)}
                       >
                         Claim
                       </motion.button>
@@ -239,7 +245,22 @@ const Page = () => {
           </Card>
         </motion.div>
       </div>
+      {showAlert && (
+  <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Success!</AlertDialogTitle>
+        <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel onClick={() => setShowAlert(false)}>Close</AlertDialogCancel>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+)}
+
     </div>
+    
   );
 };
 

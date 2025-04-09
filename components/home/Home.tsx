@@ -198,7 +198,7 @@ export default function Home({ onStartChat }: any) {
             <FlowStep
               number="04"
               icon={<Trophy className="h-6 w-6" />}
-              title="Check Leaderboard"
+              title="Type /leaderboard"
               description="See where you rank among other learners and track your growth over time to stay motivated."
             />
           </div>

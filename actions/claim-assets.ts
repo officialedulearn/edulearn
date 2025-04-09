@@ -1,13 +1,12 @@
-"use server"
-const eduManagerAddress = "0x9A6703004024059D6A8D88f2E4ceD67439809B71";
-const nft = "0xb3F5231f310231544F0Aaa5Fa3016dfFF4d228E8"
+"use server";
+const eduManagerAddress = "0x196D01f8060Dc3975032c99ed0e21f5AC55C8523";
 
 import { ethers } from "ethers";
 import eduManagerArtifact from "@/lib/artifacts/EduManagerAbi.json";
-import {resetXP} from "@/lib/db/queries"
+import { resetXP } from "@/lib/db/queries";
 
-// Chain configuration
-// export const eduChainTestnet = {
+// // Chain configuration
+// const eduChainTestnet = {
 //   id: 656476,
 //   name: "Edu Chain Testnet",
 //   rpc: "https://open-campus-codex-sepolia.drpc.org",
@@ -15,28 +14,28 @@ import {resetXP} from "@/lib/db/queries"
 //     name: "Open Campus",
 //     symbol: "EDU",
 //     decimals: 18,
-//   }
+//   },
 // };
 
-// Helper function to get signer
 function getSigner() {
   if (!process.env.NEXT_PUBLIC_ACCOUNT_PRIVATE_KEY) {
     throw new Error("PRIVATE_KEY environment variable is not set");
   }
+
+  const customNetwork = {
+    chainId: 656476,
+    name: "edu-chain-testnet",
+  };
+
   const provider = new ethers.providers.JsonRpcProvider(
     "https://rpc.open-campus-codex.gelato.digital"
   );
-  // Make sure to trim any whitespace from the private key
-  const privateKey = process.env.NEXT_PUBLIC_ACCOUNT_PRIVATE_KEY?.trim();
-  console.log(privateKey)
-  // Create wallet with private key
-  const wallet = new ethers.Wallet(privateKey);
-  // Connect wallet to provider
-  const signer = wallet.connect(provider);
-  return signer
-}
 
-// Helper function to get contract instance
+  const privateKey = process.env.NEXT_PUBLIC_ACCOUNT_PRIVATE_KEY?.trim();
+  const wallet = new ethers.Wallet(privateKey);
+  const signer = wallet.connect(provider);
+  return signer;
+}
 function getEduManagerContract(signerOrProvider: any) {
   return new ethers.Contract(
     eduManagerAddress,
@@ -58,20 +57,18 @@ export async function claimTokensForStudent(
   try {
     const signer = getSigner();
     const contract = getEduManagerContract(signer);
-    
+
     // Convert to BigNumber
     const pointsBN = ethers.BigNumber.from(points);
-    
+
     const tx = await contract.claimTokens(studentAddress, pointsBN, {
       gasLimit: 50000000, // Use a safe upper bound
     });
     const receipt = await tx.wait();
+    const resetUserXP = await resetXP(studentAddress);
 
-    const resetUserXP = await resetXP(studentAddress)
-    
     console.log(`Tokens claimed for student ${studentAddress}!`);
     console.log(`Transaction hash: ${receipt.transactionHash}`);
-    
     return receipt;
   } catch (error) {
     console.error("Error claiming tokens:", error);
@@ -88,40 +85,24 @@ export async function claimTokensForStudent(
  */
 export async function rewardCertificateToStudent(
   studentAddress: string,
-  points: number,
-  certUri: string
+  points: number
 ) {
   try {
     const signer = getSigner();
     const contract = getEduManagerContract(signer);
-    
+
     // Convert to BigNumber
     const pointsBN = ethers.BigNumber.from(points);
-    
-    const tx = await contract.rewardAndCertify(
-      studentAddress,
-      pointsBN,
-      certUri
-    );
-    const receipt = await tx.wait();
-    
+
+     const tx = await contract.rewardAndCertify(studentAddress, pointsBN);
+     const receipt = await tx.wait();
+
     console.log(`NFT certificate issued to student ${studentAddress}!`);
-    console.log(`Transaction hash: ${receipt.transactionHash}`);
-    const resetUserXP = await resetXP(studentAddress)
-    return receipt;
+     console.log(`Transaction hash: ${receipt.transactionHash}`);
+    const resetUserXP = await resetXP(studentAddress);
+    return receipt
   } catch (error) {
     console.error("Error rewarding certificate:", error);
     throw error;
   }
 }
-
-// Example usage:
-// 
-// // Import the functions
-// import { claimTokensForStudent, rewardCertificateToStudent } from './path-to-this-file';
-//
-// // Claim tokens
-// await claimTokensForStudent("0xStudentAddress", 750);
-// 
-// // Reward certificate
-// await rewardCertificateToStudent("0xStudentAddress", 1500, "ipfs://YOUR_IPFS_URI_HERE");
