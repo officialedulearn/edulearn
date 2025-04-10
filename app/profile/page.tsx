@@ -59,9 +59,7 @@ const [alertMessage, setAlertMessage] = useState("Your asset has been minted suc
     };
 
     loadUserData();
-  }, []); // Empty dependency array to prevent infinite loops
-
-  // XP level calculation (example breakpoints)
+  }, []); 
   const getUserLevel = (xp: number) => {
     if (xp >= 5000) return { level: 5, title: "Expert" };
     if (xp >= 3000) return { level: 4, title: "Advanced" };
@@ -76,7 +74,6 @@ const [alertMessage, setAlertMessage] = useState("Your asset has been minted suc
 
     const claimTokensForUser = async (userAddress: string, userPoints: number) => {
       await claimTokens(userAddress, userPoints);
-      console.log("Claimed tokens for user:", userAddress, "with points:", userPoints);
       setAlertMessage("🎉 Tokens have been minted successfully!");
       setShowAlert(true);
       
@@ -84,7 +81,6 @@ const [alertMessage, setAlertMessage] = useState("Your asset has been minted suc
     
     const claimNFTforUser = async (address: string, userPoints: number) => {
       await rewardCertificateToStudent(address, userPoints);
-      console.log("Claimed NFT for user:", address);
       setAlertMessage("🎉 NFT has been rewarded successfully!");
       setShowAlert(true);
     };

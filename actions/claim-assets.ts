@@ -44,12 +44,7 @@ function getEduManagerContract(signerOrProvider: any) {
   );
 }
 
-/**
- * Claims tokens for a student based on points earned
- * @param studentAddress Wallet address of the student
- * @param points Number of points to convert to tokens
- * @returns Transaction receipt
- */
+
 export async function claimTokensForStudent(
   studentAddress: string,
   points: number
@@ -76,13 +71,6 @@ export async function claimTokensForStudent(
   }
 }
 
-/**
- * Rewards a student with an NFT certificate
- * @param studentAddress Wallet address of the student
- * @param points Points associated with the certificate
- * @param certUri IPFS URI for the certificate metadata
- * @returns Transaction receipt
- */
 export async function rewardCertificateToStudent(
   studentAddress: string,
   points: number

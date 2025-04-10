@@ -1,7 +1,4 @@
 'use client';
-
-import { useState } from 'react';
-
 interface MultimodalInputProps {
   chatId: string;
   input: string;

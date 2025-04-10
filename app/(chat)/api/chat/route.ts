@@ -24,8 +24,6 @@ export async function POST(request: Request) {
     console.log(body);
 
     const { id, messages, selectedChatModel } = body;
-
-    const session = await auth();
     const user = await getUser();
 
     if (!user || !user.sub) {
@@ -44,13 +42,11 @@ export async function POST(request: Request) {
 
     if (!chat) {
       title = await generateTitleFromUserMessage({ message: userMessage });
-      console.log(title);
       await saveChat({ id, userAddress: user.sub, title });
     } else {
       if (chat.userAddress !== user.sub) {
         return new NextResponse("Unauthorized", { status: 401 });
       }
-      // Assign the existing chat's title
       title = chat.title;
     }
 
