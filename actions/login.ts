@@ -26,7 +26,6 @@ export async function login(payload: VerifyLoginPayloadParams) {
       payload: verifiedPayload.payload,
     });
     (await cookies()).set("jwt", jwt);
-    console.log(jwt);
   }
   const existingUser = await getUserFromDB(payload.payload.address);
   if (!existingUser.length) {

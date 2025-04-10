@@ -24,7 +24,6 @@ export async function POST(request: Request) {
     // Get the chat history
     const chat = await getChatById({ id: chatId });
     const storedMessages = await getMessagesByChatId({ id: chatId });
-    console.log(storedMessages)
 
     if (!chat) {
       return new NextResponse("Chat not found", { status: 404 });
@@ -36,7 +35,6 @@ export async function POST(request: Request) {
 
     // Get messages from the chat
     const messages = storedMessages || [];
-    console.log("Messages" + ":" + JSON.stringify(messages))
 
     try {
       // Format messages for Gemini API - properly structured
@@ -50,10 +48,7 @@ export async function POST(request: Request) {
         });
       }
 
-      // Add the instruction to generate quiz questions as the last message
       
-
-      // Generate content with Gemini - using the approach you prefer
       const result = await genAI.models.generateContent({
         model: "gemini-2.0-flash",
         contents: `Our conversation: ${JSON.stringify(messages)}`,
