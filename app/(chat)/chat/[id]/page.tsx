@@ -8,8 +8,8 @@ import { convertToUIMessages } from "@/lib/utils";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import { getUser } from "@/actions/login";
 
-export default async function Page(props: { params: { id: string } }) {
-  const { id } = props.params;
+export default async function Page({ params }: { params: { id: string } }) {
+  const { id } = params as { id: string };
 
   console.log("ID from params:", id);
 
