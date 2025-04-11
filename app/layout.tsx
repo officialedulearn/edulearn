@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThirdwebProvider } from "thirdweb/react";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://google.com"), // todo: add your base URL
@@ -57,6 +58,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
+        <Analytics />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
