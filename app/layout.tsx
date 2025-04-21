@@ -6,7 +6,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://google.com"), // todo: add your base URL
+  metadataBase: new URL("https://edulearn-six.vercel.app"), // todo: add your base URL
   title: "Edulearn",
   description: "Learn with ai and blockchain",
 };

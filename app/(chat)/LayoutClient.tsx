@@ -6,6 +6,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import Home from "@/components/home/Home";
 import { User } from "@/types";
+
 export function LayoutClient({
   children,
   isCollapsed,
@@ -22,7 +23,13 @@ export function LayoutClient({
       setUser({ address: userAccount.address });
     }
   }, [userAccount]);
-  
+
+  useEffect(() => {
+    if (!showChat) {
+      document.title = "EduLearn - Learn with AI and Blockchain";
+    } 
+  }, [showChat]);
+
   const handleStartChat = () => {
     setShowChat(true);
   };
