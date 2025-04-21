@@ -7,12 +7,9 @@ import { getAllUsersAndXPAction } from "@/actions/user-xp";
 import { useState, useEffect } from "react";
 import { getUser } from "@/actions/login";
 import Link from "next/link";
+import { truncateWalletAddress } from "@/lib/constants";
 
-export const truncateWalletAddress = (address: string) => {
-  return address.length > 2
-    ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-    : "";
-};
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -29,6 +26,8 @@ const itemVariants = {
 };
 
 const LeaderboardRow = ({ user, rank, isCurrentUser }: { user: any; rank: number; isCurrentUser: boolean }) => {
+ 
+
   return (
     <motion.div
       variants={itemVariants}
@@ -210,7 +209,7 @@ export default function EduLeaderboard() {
           transition={{ delay: 0.6, duration: 0.4 }}
         >
           <p className="text-emerald-300">
-            You're currently ranked <span className="font-bold">#{currentUserRank}</span> with <span className="font-bold">{allUsers.find(user => user.address === userAddress)?.xp.toLocaleString()} XP</span>
+            You&apos;re currently ranked <span className="font-bold">#{currentUserRank}</span> with <span className="font-bold">{allUsers.find(user => user.address === userAddress)?.xp.toLocaleString()} XP</span>
           </p>
         </motion.div>
       )}

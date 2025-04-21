@@ -79,7 +79,7 @@ export default function TestResults({
         <CardHeader>
           <CardTitle>Test Results</CardTitle>
           <CardDescription>
-            You completed the test in time. Here's how you did:
+            You completed the test in time. Here&apos;s how you did:
           </CardDescription>
         </CardHeader>
 

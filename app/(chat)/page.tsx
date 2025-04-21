@@ -8,7 +8,6 @@ export default async function Page() {
           key={id}
           id={id}
           initialMessages={[]}
-          selectedChatModel=""
           isReadonly={false}
         />
     </>

@@ -1,9 +1,7 @@
 import { getUser } from '@/actions/login';
-import { auth } from '@/app/(auth)/auth';
 import { getChatsByUserId } from '@/lib/db/queries';
 
 export async function GET() {
-  const session = await auth();
   const user = await getUser()
 
   if (!user) {

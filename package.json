@@ -1,10 +1,10 @@
 {
-  "name": "ai-chatbot",
+  "name": "edulearn",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "tsx lib/db/migrate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint && biome lint --write --unsafe",
     "lint:fix": "next lint --fix && biome lint --write --unsafe",
@@ -53,7 +53,6 @@
     "ai": "4.1.50",
     "axios": "^1.8.4",
     "bcrypt-ts": "^5.0.2",
-    "canvas": "^3.1.0",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",

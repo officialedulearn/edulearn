@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/app/(auth)/auth";
 import { getUser } from "@/actions/login";
 import { generateUUID, getMostRecentUserMessage } from "@/lib/utils";
 import {
@@ -8,11 +7,8 @@ import {
   saveChat,
   getChatById,
 } from "@/lib/db/queries";
-import { createDataStreamResponse } from "@/lib/utils";
 import { GoogleGenAI } from "@google/genai";
-import { systemPrompt } from "@/lib/ai/prompts";
 import { generateTitleFromUserMessage } from "../../actions";
-import { Message } from "@/components/message"; // Import custom Message type
 
 const API_KEY = process.env.GEMINI_API_KEY as string;
 const genAI = new GoogleGenAI({ apiKey: API_KEY });
@@ -23,7 +19,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     console.log(body);
 
-    const { id, messages, selectedChatModel } = body;
+    const { id, messages } = body;
     const user = await getUser();
 
     if (!user || !user.sub) {
@@ -35,8 +31,6 @@ export async function POST(request: Request) {
     if (!userMessage) {
       return new NextResponse("No user message found", { status: 400 });
     }
-
-    // Check if the chat already exists
     const chat = await getChatById({ id });
     let title: string;
 
@@ -50,7 +44,6 @@ export async function POST(request: Request) {
       title = chat.title;
     }
 
-    // Save the user message
     await saveMessages({
       messages: [{ ...userMessage, createdAt: new Date(), chatId: id }],
     });

@@ -151,7 +151,7 @@ export default function TestPage() {
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <Card className="w-full max-w-2xl p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="size-8 animate-spin text-primary" />
             <p className="text-lg font-medium">
               Generating your test questions...
             </p>

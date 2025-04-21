@@ -1,3 +1,4 @@
+import { getUser } from '@/actions/login';
 import { auth } from '@/app/(auth)/auth';
 import {
   deleteDocumentsByIdAfterTimestamp,
@@ -13,9 +14,8 @@ export async function GET(request: Request) {
     return new Response('Missing id', { status: 400 });
   }
 
-  const session = await auth();
-
-  if (!session || !session.user) {
+  const user = await getUser();
+  if (!user || !user.sub) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  if (document.userId !== session.user.id) {
+  if (document.userId !== user.sub) {
     return new Response('Unauthorized', { status: 401 });
   }
 

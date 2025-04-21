@@ -1,3 +1,4 @@
+import { getUser } from '@/actions/login';
 import { auth } from '@/app/(auth)/auth';
 import { getSuggestionsByDocumentId } from '@/lib/db/queries';
 
@@ -9,9 +10,9 @@ export async function GET(request: Request) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const session = await auth();
+  const user = await getUser()
 
-  if (!session || !session.user) {
+  if (!user || !user.sub) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
     return Response.json([], { status: 200 });
   }
 
-  if (suggestion.userId !== session.user.id) {
+  if (suggestion.userId !== user.sub) {
     return new Response('Unauthorized', { status: 401 });
   }
 

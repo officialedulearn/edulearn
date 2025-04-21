@@ -24,7 +24,7 @@ export default function QuestionCard({ question, selectedAnswer, onSelectAnswer 
         {question.options.map((option, index) => (
           <div key={index} className="flex items-center space-x-2 p-3 rounded-md border hover:bg-gray-50">
             <RadioGroupItem value={option} id={`option-${index}`} />
-            <Label htmlFor={`option-${index}`} className="flex-grow cursor-pointer">
+            <Label htmlFor={`option-${index}`} className="grow cursor-pointer">
               {option}
             </Label>
           </div>

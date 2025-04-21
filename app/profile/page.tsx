@@ -1,27 +1,20 @@
 "use client";
-
-import { getUser } from "@/actions/login";
-import { getUserFromDetails } from "@/actions/login";
+import { getUserFromDetails, getUser } from "@/actions/login";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Router } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { claimTokensForStudent as claimTokens, rewardCertificateToStudent } from "@/actions/claim-assets";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-
-
-
 interface UserData {
   id: string;
   address: string;

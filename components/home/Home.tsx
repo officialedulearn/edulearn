@@ -36,7 +36,7 @@ export default function Home({ onStartChat }: any) {
     <main className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Background Elements */}
       <div className="fixed inset-0 z-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+        <div className="absolute top-0 left-0 size-full opacity-10">
           {Array.from({ length: 20 }).map((_, i) => (
             <div
               key={i}
@@ -52,7 +52,7 @@ export default function Home({ onStartChat }: any) {
             />
           ))}
         </div>
-        <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-0 left-0 size-full">
           <svg width="100%" height="100%" className="opacity-5">
             <pattern
               id="grid"
@@ -90,8 +90,8 @@ export default function Home({ onStartChat }: any) {
         />
 
         <div className="max-w-4xl mx-auto text-center relative">
-          <div className="absolute -top-32 left-1/2 w-64 h-64 rounded-full border border-white/10 -translate-x-1/2" />
-          <div className="absolute -top-48 left-1/2 w-96 h-96 rounded-full border border-white/5 -translate-x-1/2" />
+          <div className="absolute -top-32 left-1/2 size-64 rounded-full border border-white/10 -translate-x-1/2" />
+          <div className="absolute -top-48 left-1/2 size-96 rounded-full border border-white/5 -translate-x-1/2" />
 
           <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
             <span className="block mb-2">Learn smarter</span>
@@ -111,16 +111,16 @@ export default function Home({ onStartChat }: any) {
               className="relative h-16 px-10 text-lg rounded-lg bg-black text-white border border-white/20 hover:bg-white hover:text-black transition-all duration-300"
             >
               Go to Chat
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 size-5" />
             </Button>
           </div>
 
           <div className="flex justify-center gap-12 mt-12">
-            <button onClick={() => router.push('/leaderboard')} className="relative text-white/50 hover:text-white transition-colors duration-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-white hover:after:w-full after:transition-all after:duration-300">
+            <button onClick={() => router.push('/leaderboard')} className="relative text-white/50 hover:text-white transition-colors duration-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-white hover:after:w-full after:transition-all after:duration-300">
               Go to Leaderboard
             </button>
             <button
-              className="relative text-white/50 hover:text-white transition-colors duration-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 after:bg-white hover:after:w-full after:transition-all after:duration-300"
+              className="relative text-white/50 hover:text-white transition-colors duration-300 after:content-[''] after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-white hover:after:w-full after:transition-all after:duration-300"
               onClick={scrollToFlow}
             >
               How it Works
@@ -176,28 +176,28 @@ export default function Home({ onStartChat }: any) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
             <FlowStep
               number="01"
-              icon={<MessageSquare className="h-6 w-6" />}
+              icon={<MessageSquare className="size-6" />}
               title="Chat with the AI"
               description="Pick a topic and start learning through natural conversation. Our AI adapts to your learning style."
             />
 
             <FlowStep
               number="02"
-              icon={<CheckCircle className="h-6 w-6" />}
+              icon={<CheckCircle className="size-6" />}
               title="Type /test"
               description="When you're ready, trigger a personalized quiz to test your understanding and reinforce key concepts."
             />
 
             <FlowStep
               number="03"
-              icon={<Target className="h-6 w-6" />}
+              icon={<Target className="size-6" />}
               title="Earn XP"
               description="Complete tests to gain experience points and unlock special rewards as you progress through your learning journey."
             />
 
             <FlowStep
               number="04"
-              icon={<Trophy className="h-6 w-6" />}
+              icon={<Trophy className="size-6" />}
               title="Type /leaderboard"
               description="See where you rank among other learners and track your growth over time to stay motivated."
             />
@@ -222,7 +222,7 @@ function FlowStep({ number, icon, title, description }: FlowStepProps) {
     <div className="group relative">
       <div className="absolute -inset-1 bg-white/5 rounded-lg blur-md opacity-0 group-hover:opacity-100 transition duration-500"></div>
       <div className="relative border border-white/10 rounded-lg p-8 transition-all duration-300 group-hover:border-white/30 bg-black">
-        <div className="absolute -top-5 -left-5 w-10 h-10 bg-black flex items-center justify-center border border-white/20 rounded-full">
+        <div className="absolute -top-5 -left-5 size-10 bg-black flex items-center justify-center border border-white/20 rounded-full">
           <span className="text-sm font-mono">{number}</span>
         </div>
 
@@ -233,7 +233,7 @@ function FlowStep({ number, icon, title, description }: FlowStepProps) {
 
         <p className="text-white/70 leading-relaxed">{description}</p>
 
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform translate-y-1"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-y-1"></div>
       </div>
     </div>
   );

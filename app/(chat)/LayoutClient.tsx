@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import Home from "@/components/home/Home";
+import { User } from "@/types";
 export function LayoutClient({
   children,
   isCollapsed,
@@ -13,7 +14,7 @@ export function LayoutClient({
   isCollapsed: boolean;
 }) {
   const userAccount = useActiveAccount?.() || null;
-  const [user, setUser] = useState<{ address?: string }>({});
+  const [user, setUser] = useState<User>({});
   const [showChat, setShowChat] = useState(false);
   
   useEffect(() => {

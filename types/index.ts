@@ -7,3 +7,6 @@ export type UserSession = {
     nbf: string,
     ctx: String
 }
+export type User = {
+    address?: string;
+}

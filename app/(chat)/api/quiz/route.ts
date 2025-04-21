@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/app/(auth)/auth";
 import { getUser } from "@/actions/login";
-import { generateUUID } from "@/lib/utils";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
 import { GoogleGenAI } from "@google/genai";
 
@@ -13,8 +11,6 @@ export async function POST(request: Request) {
   try {
     const { chatId } = await request.json();
 
-    // Authenticate user
-    const session = await auth();
     const user = await getUser();
 
     if (!user || !user.sub) {

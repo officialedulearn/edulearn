@@ -15,14 +15,12 @@ import { useRouter } from "next/navigation";
 type ChatProps = {
   id: string;
   initialMessages: Array<Message>;
-  selectedChatModel: string;
   isReadonly: boolean;
 };
 
 export function Chat({
   id,
   initialMessages,
-  selectedChatModel,
   isReadonly,
 }: ChatProps) {
   const { mutate } = useSWRConfig();
@@ -66,7 +64,6 @@ export function Chat({
         body: JSON.stringify({
           id, // Chat ID
           messages: [...messages, newMessage], // Send all messages including new one
-          selectedChatModel,
         }),
       });
       
@@ -147,7 +144,6 @@ export function Chat({
     <div className="flex flex-col min-w-0 h-dvh bg-background">
       <ChatHeader
         chatId={id}
-        selectedModelId={selectedChatModel}
         isReadonly={isReadonly}
       />
 
