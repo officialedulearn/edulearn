@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import Script from "next/script";
 import { LayoutClient } from "./LayoutClient";
+import { Analytics } from "@vercel/analytics/react"
 
 export const experimental_ppr = true;
 
@@ -24,6 +25,7 @@ export default async function Layout({
         src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"
         strategy="beforeInteractive"
       />
+      <Analytics />
       <LayoutClient isCollapsed={isCollapsed}>{children}</LayoutClient>
     </>
   );
