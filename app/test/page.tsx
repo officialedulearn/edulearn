@@ -1,7 +1,10 @@
-import TestPage from "./TestPageCient";
+import { Suspense } from "react";
+import TestPageClient from "./TestPageCient";
 
-export default function Page() {  
+export default function TestPage() {
   return (
-      <TestPage />
+    <Suspense fallback={<div>Loading test page...</div>}>
+      <TestPageClient />
+    </Suspense>
   );
 }
